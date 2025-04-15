@@ -1,5 +1,8 @@
 package ir.maktabsharifhw17.jdbc.config;
 
+import ir.maktabsharifhw17.jdbc.repository.UserRepository;
+import ir.maktabsharifhw17.jdbc.repository.UserRepositoryImp;
+
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
@@ -33,5 +36,14 @@ public class ApplicationContext {
             }
         }
         return connection;
+    }
+
+    private UserRepository userRepository;
+
+    public UserRepository getUserRepository() {
+        if (userRepository == null) {
+            userRepository = new UserRepositoryImp(getConnection());
+        }
+        return userRepository;
     }
 }
