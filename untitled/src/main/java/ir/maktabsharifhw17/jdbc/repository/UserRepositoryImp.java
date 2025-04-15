@@ -2,10 +2,15 @@ package ir.maktabsharifhw17.jdbc.repository;
 
 import ir.maktabsharifhw17.jdbc.domains.User;
 
+import java.sql.Connection;
 import java.util.List;
 import java.util.Optional;
 
 public class UserRepositoryImp implements UserRepository {
+    public UserRepositoryImp(Connection connection) {
+
+    }
+
     @Override
     public User create(User user) {
         return null;
