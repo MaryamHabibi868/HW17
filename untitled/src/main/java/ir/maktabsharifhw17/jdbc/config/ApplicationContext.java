@@ -1,9 +1,6 @@
 package ir.maktabsharifhw17.jdbc.config;
 
-import ir.maktabsharifhw17.jdbc.repository.CardRepository;
-import ir.maktabsharifhw17.jdbc.repository.CardRepositoryImp;
-import ir.maktabsharifhw17.jdbc.repository.UserRepository;
-import ir.maktabsharifhw17.jdbc.repository.UserRepositoryImp;
+import ir.maktabsharifhw17.jdbc.repository.*;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
@@ -56,5 +53,14 @@ public class ApplicationContext {
             cardRepository = new CardRepositoryImp(getConnection());
         }
         return cardRepository;
+    }
+
+    private TransactionRepository transactionRepository;
+
+    public TransactionRepository getTransactionRepository() {
+        if (transactionRepository == null) {
+            transactionRepository = new TransactionRepositoryImp(getConnection());
+        }
+        return transactionRepository;
     }
 }

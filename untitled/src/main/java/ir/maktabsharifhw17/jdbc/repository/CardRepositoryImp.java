@@ -102,6 +102,7 @@ public class CardRepositoryImp implements CardRepository {
         return 0;
     }
 
+    @Override
     public Optional<Card> findByCardNumber(String cardNumber) {
         String query = "select * from cards where card_number = ?";
         try (PreparedStatement preparedStatement = connection.prepareStatement(query)){
