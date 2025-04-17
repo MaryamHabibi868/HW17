@@ -6,6 +6,9 @@ import ir.maktabsharifhw17.jdbc.domains.TransactionStatus;
 import ir.maktabsharifhw17.jdbc.domains.TransactionType;
 
 import java.sql.Connection;
+import java.sql.Date;
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
@@ -22,7 +25,30 @@ public class TransactionRepositoryImp implements
 
     @Override
     public Transaction create(Transaction transaction) {
-        return null;
+        String query = "insert into transactions" +
+                "(transaction_id , source_card_number, destination_card_number," +
+                " amount , transaction_type , transaction_status , transaction_date" +
+                "values ( ? , ? , ? , ? , ? , ? , ?)";
+
+        try (PreparedStatement preparedStatement = connection.prepareStatement(query)){
+            preparedStatement.setInt(1, transaction.getId());
+            preparedStatement.setString(2 , String.valueOf(transaction.getSourceCardNumber()));
+            preparedStatement.setString(3 , String.valueOf(transaction.getDestinationCardNumber()));
+            preparedStatement.setDouble(4 , transaction.getAmount());
+            preparedStatement.setString(5, transaction.getTransactionType().name());
+            preparedStatement.setString(6, transaction.getTransactionStatus().name());
+            preparedStatement.setDate(7, Date.valueOf(String.valueOf(transaction.getTransactionDate())));
+
+            int rowsAffected = preparedStatement.executeUpdate();
+            if (rowsAffected > 0) {
+                return transaction;
+            } else {
+                return null;
+            }
+
+        } catch (SQLException e) {
+            throw new RuntimeException("Error inserting transaction " + transaction);
+        }
     }
 
     @Override

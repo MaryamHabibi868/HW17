@@ -44,7 +44,24 @@ public class CardRepositoryImp implements CardRepository {
 
     @Override
     public Card update(Card card) {
-        return null;
+        String query = "update cards set card_number = ? , bank_name = ? , balance = ? , expired_date = ?, user_id = ? where card_id = ?";
+
+        try (PreparedStatement preparedStatement = connection.prepareStatement(query)) {
+            preparedStatement.setString(1, card.getCardNumber());
+            preparedStatement.setString(2, card.getBankName().name());
+            preparedStatement.setDouble(3, card.getBalance());
+            preparedStatement.setDate(4, Date.valueOf(card.getExpiredDate()));
+            preparedStatement.setInt(5, card.getUser().getId());
+            preparedStatement.setInt(6, card.getId());
+
+            int rowAffected = preparedStatement.executeUpdate();
+            if (rowAffected > 0) {
+                return card;
+            }
+            return null;
+        } catch (SQLException e) {
+            throw new RuntimeException("Error updating card with id " + card.getId());
+        }
     }
 
     @Override
