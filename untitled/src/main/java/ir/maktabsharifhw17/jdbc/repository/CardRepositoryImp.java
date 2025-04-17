@@ -18,19 +18,22 @@ public class CardRepositoryImp implements CardRepository {
     }
     @Override
     public Card create(Card card) {
-        String query = "insert into cards (card_id, card_number, bank_name, " +
-                "balance, expired_date, user_id) values (?, ?, ?, ?, ?, ?)";
+        String query = "insert into cards (card_number, bank_name, " +
+                "balance, expired_date, user_id) values (?, ?, ?, ?, ?)";
         try (PreparedStatement preparedStatement = connection.prepareStatement(query)){
-            preparedStatement.setInt(1, card.getId());
-            preparedStatement.setString(2, card.getCardNumber());
-            preparedStatement.setString(3, card.getBankName().name());
-            preparedStatement.setDouble(4, card.getBalance());
-            preparedStatement.setDate(5, Date.valueOf(card.getExpiredDate()));
-            preparedStatement.setInt(6, card.getUser().getId());
+            preparedStatement.setString(1, card.getCardNumber());
+            preparedStatement.setString(2, card.getBankName().name());
+            preparedStatement.setDouble(3, card.getBalance());
+            preparedStatement.setDate(4, Date.valueOf(card.getExpiredDate()));
+            preparedStatement.setInt(5, card.getUser().getId());
 
             int rowAffected = preparedStatement.executeUpdate();
 
             if (rowAffected > 0) {
+                ResultSet generatedKeys = preparedStatement.getGeneratedKeys();
+                if (generatedKeys.next()) {
+                    card.setId(generatedKeys.getInt(1));
+                }
                 return card;
             } else {
                 return null;

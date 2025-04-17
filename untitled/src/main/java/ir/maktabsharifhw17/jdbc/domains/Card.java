@@ -29,4 +29,13 @@ public class Card extends BaseEntity<Integer> {
     private LocalDate expiredDate;
     private User user;
 
+
+    public Card(String cardNumber, BankName bankName,
+                Double balance, LocalDate expiredDate, User user) {
+        this.cardNumber = cardNumber;
+        this.bankName = bankName;
+        this.balance = balance;
+        this.expiredDate = expiredDate;
+        this.user = user;
+    }
 }

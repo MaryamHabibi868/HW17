@@ -19,18 +19,21 @@ public class UserRepositoryImp implements UserRepository {
 
     @Override
     public User create(User user) {
-        String query = "INSERT INTO users (user_id, first_name, " +
-                "last_name, user_name, password) VALUES (?, ?, ?, ?, ?)";
+        String query = "INSERT INTO users (first_name, " +
+                "last_name, user_name, password) VALUES (?, ?, ?, ?)";
         try (PreparedStatement preparedStatement = connection.prepareStatement(query)){
-            preparedStatement.setInt(1, user.getId());
-            preparedStatement.setString(2, user.getFirstName());
-            preparedStatement.setString(3, user.getLastName());
-            preparedStatement.setString(4, user.getUserName());
-            preparedStatement.setString(5, user.getPassword());
+            preparedStatement.setString(1, user.getFirstName());
+            preparedStatement.setString(2, user.getLastName());
+            preparedStatement.setString(3, user.getUserName());
+            preparedStatement.setString(4, user.getPassword());
 
             int rowsAffected = preparedStatement.executeUpdate();
 
             if (rowsAffected > 0) {
+                ResultSet generatedKeys = preparedStatement.getGeneratedKeys();
+                if (generatedKeys.next()) {
+                    user.setId(generatedKeys.getInt(1));
+                }
                 return user;
             } else {
                 return null;

@@ -3,7 +3,7 @@ drop table if exists users, cards, transactions;
 
 create table users
 (
-    user_id    int primary key,
+    user_id    serial primary key,
     first_name varchar(50),
     last_name  varchar(50),
     user_name  varchar(70) unique ,
@@ -13,7 +13,7 @@ create table users
 
 create table cards
 (
-    card_id      int primary key,
+    card_id      serial primary key,
     card_number  varchar(16) unique ,
     bank_name    varchar(30),
     balance      double precision,
@@ -23,7 +23,7 @@ create table cards
 
 create table transactions
 (
-    transaction_id          int primary key,
+    transaction_id          serial primary key,
     source_card_number      varchar(16),
     destination_card_number varchar(16),
     amount                  double precision,

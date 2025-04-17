@@ -4,11 +4,9 @@ import ir.maktabsharifhw17.jdbc.domains.Card;
 import ir.maktabsharifhw17.jdbc.domains.Transaction;
 import ir.maktabsharifhw17.jdbc.domains.TransactionStatus;
 import ir.maktabsharifhw17.jdbc.domains.TransactionType;
+import ir.maktabsharifhw17.jdbc.domains.base.BaseEntity;
 
-import java.sql.Connection;
-import java.sql.Date;
-import java.sql.PreparedStatement;
-import java.sql.SQLException;
+import java.sql.*;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
@@ -26,21 +24,24 @@ public class TransactionRepositoryImp implements
     @Override
     public Transaction create(Transaction transaction) {
         String query = "insert into transactions" +
-                "(transaction_id , source_card_number, destination_card_number," +
-                " amount , transaction_type , transaction_status , transaction_date" +
-                "values ( ? , ? , ? , ? , ? , ? , ?)";
+                "(source_card_number, destination_card_number," +
+                " amount , transaction_type , transaction_status , transaction_date)" +
+                " values ( ? , ? , ? , ? , ? , ?)";
 
         try (PreparedStatement preparedStatement = connection.prepareStatement(query)){
-            preparedStatement.setInt(1, transaction.getId());
-            preparedStatement.setString(2 , String.valueOf(transaction.getSourceCardNumber()));
-            preparedStatement.setString(3 , String.valueOf(transaction.getDestinationCardNumber()));
-            preparedStatement.setDouble(4 , transaction.getAmount());
-            preparedStatement.setString(5, transaction.getTransactionType().name());
-            preparedStatement.setString(6, transaction.getTransactionStatus().name());
-            preparedStatement.setDate(7, Date.valueOf(String.valueOf(transaction.getTransactionDate())));
+            preparedStatement.setString(1 , transaction.getSourceCard().getCardNumber());
+            preparedStatement.setString(2 , transaction.getDestinationCard().getCardNumber());
+            preparedStatement.setDouble(3 , transaction.getAmount());
+            preparedStatement.setString(4, transaction.getTransactionType().name());
+            preparedStatement.setString(5, transaction.getTransactionStatus().name());
+            preparedStatement.setTimestamp(6, Timestamp.valueOf(transaction.getTransactionDate()));
 
             int rowsAffected = preparedStatement.executeUpdate();
             if (rowsAffected > 0) {
+                ResultSet generatedKeys = preparedStatement.getGeneratedKeys();
+                if (generatedKeys.next()) {
+                    transaction.setId(generatedKeys.getInt(1));
+                }
                 return transaction;
             } else {
                 return null;
@@ -112,8 +113,8 @@ public class TransactionRepositoryImp implements
         Card sourceCard = findSourceCard.get();
         Card destinationCard = findDestinationCard.get();
 
-        transaction.setSourceCardNumber(sourceCard);
-        transaction.setDestinationCardNumber(destinationCard);
+        transaction.setSourceCard(sourceCard);
+        transaction.setDestinationCard(destinationCard);
 
         if (amount > 15_000_000) {
             transaction.setTransactionStatus(TransactionStatus.FAILED);
@@ -137,7 +138,7 @@ public class TransactionRepositoryImp implements
                 return transaction;
             }
             sourceCard.setBalance(sourceCard.getBalance() - (amount + fee));
-            destinationCard.setBalance(destinationCard.getBalance() + fee);
+            destinationCard.setBalance(destinationCard.getBalance() + amount);
 
             transaction.setTransactionStatus(TransactionStatus.SUCCESSFUL);
 
@@ -148,5 +149,13 @@ public class TransactionRepositoryImp implements
 
             return transaction;
         }
+    }
+
+    public Transaction performPaya (String sourceCardNumber , String destinationCardNumber,
+                                    double amount) {
+        CardRepository cardRepository = new CardRepositoryImp(connection);
+        TransactionRepository transactionRepository = new TransactionRepositoryImp(connection);
+        Transaction transaction = new Transaction();
+
     }
 }

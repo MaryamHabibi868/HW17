@@ -6,7 +6,6 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 @Getter
@@ -24,8 +23,8 @@ public class Transaction extends BaseEntity<Integer> {
     public static final String TRANSACTION_STATUS = "transaction_status";
     public static final String TRANSACTION_DATE = "transaction_date";
 
-    private Card sourceCardNumber;
-    private Card destinationCardNumber;
+    private Card sourceCard;
+    private Card destinationCard;
     private Double amount;
     private TransactionType transactionType;
     private TransactionStatus transactionStatus;
