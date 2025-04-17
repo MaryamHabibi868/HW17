@@ -1,5 +1,6 @@
 package ir.maktabsharifhw17.jdbc.repository;
 
+import ir.maktabsharifhw17.jdbc.config.ApplicationContext;
 import ir.maktabsharifhw17.jdbc.domains.Card;
 import ir.maktabsharifhw17.jdbc.domains.Transaction;
 import ir.maktabsharifhw17.jdbc.domains.TransactionStatus;
@@ -96,7 +97,6 @@ public class TransactionRepositoryImp implements
         TransactionRepository transactionRepository = new TransactionRepositoryImp(connection);
 
         Transaction transaction = new Transaction();
-        transaction.setId();
         transaction.setTransactionType(TransactionType.CARD_TO_CARD);
         transaction.setAmount(amount);
         transaction.setTransactionDate(LocalDateTime.now());
@@ -151,11 +151,114 @@ public class TransactionRepositoryImp implements
         }
     }
 
-    public Transaction performPaya (String sourceCardNumber , String destinationCardNumber,
-                                    double amount) {
-        CardRepository cardRepository = new CardRepositoryImp(connection);
-        TransactionRepository transactionRepository = new TransactionRepositoryImp(connection);
-        Transaction transaction = new Transaction();
+    public Transaction performPaya(String sourceCardNumber, String destinationCardNumber,
+                                   double amount) {
+        CardRepository cardRepository = ApplicationContext.getInstance().getCardRepository();
+        TransactionRepository transactionRepository = ApplicationContext.getInstance().getTransactionRepository();
 
+        Transaction transaction = new Transaction();
+        transaction.setTransactionType(TransactionType.PAYA_INDIVIDUAL);
+        transaction.setAmount(amount);
+        transaction.setTransactionDate(LocalDateTime.now());
+
+        Optional<Card> sourceOpt = cardRepository.findByCardNumber(sourceCardNumber);
+        Optional<Card> destOpt = cardRepository.findByCardNumber(destinationCardNumber);
+
+        if (sourceOpt.isEmpty() || destOpt.isEmpty()) {
+            transaction.setTransactionStatus(TransactionStatus.FAILED);
+            transactionRepository.create(transaction);
+            return transaction;
+        }
+
+        Card sourceCard = sourceOpt.get();
+        Card destinationCard = destOpt.get();
+
+        transaction.setSourceCard(sourceCard);
+        transaction.setDestinationCard(destinationCard);
+
+        if (amount > 50_000_000) {
+            transaction.setTransactionStatus(TransactionStatus.FAILED);
+            transactionRepository.create(transaction);
+            return transaction;
+        }
+
+        double fee = amount * 0.001;
+
+
+        if (sourceCard.getBalance() < amount + fee) {
+            transaction.setTransactionStatus(TransactionStatus.FAILED);
+            transactionRepository.create(transaction);
+            return transaction;
+        }
+
+        sourceCard.setBalance(sourceCard.getBalance() - (amount + fee));
+        destinationCard.setBalance(destinationCard.getBalance() + amount);
+
+
+        transaction.setTransactionStatus(TransactionStatus.SUCCESSFUL);
+
+        cardRepository.update(sourceCard);
+        cardRepository.update(destinationCard);
+
+        transactionRepository.create(transaction);
+
+        return transaction;
     }
+
+    public Transaction performSatna(String sourceCardNumber, String destinationCardNumber,
+                                    double amount) {
+        CardRepository cardRepository = ApplicationContext.getInstance().getCardRepository();
+        TransactionRepository transactionRepository = ApplicationContext.getInstance().getTransactionRepository();
+
+        Transaction transaction = new Transaction();
+        transaction.setTransactionType(TransactionType.SATNA);
+        transaction.setAmount(amount);
+        transaction.setTransactionDate(LocalDateTime.now());
+
+        Optional<Card> sourceOpt = cardRepository.findByCardNumber(sourceCardNumber);
+        Optional<Card> destOpt = cardRepository.findByCardNumber(destinationCardNumber);
+
+        if (sourceOpt.isEmpty() || destOpt.isEmpty()) {
+            transaction.setTransactionStatus(TransactionStatus.FAILED);
+            transactionRepository.create(transaction);
+            return transaction;
+        }
+
+        Card sourceCard = sourceOpt.get();
+        Card destinationCard = destOpt.get();
+
+        transaction.setSourceCard(sourceCard);
+        transaction.setDestinationCard(destinationCard);
+
+        if (amount <= 50_000_000 || amount > 200_000_000) {
+            transaction.setTransactionStatus(TransactionStatus.FAILED);
+            transactionRepository.create(transaction);
+            return transaction;
+        }
+
+
+        double fee = amount * 0.002;
+
+
+        if (sourceCard.getBalance() < amount + fee) {
+            transaction.setTransactionStatus(TransactionStatus.FAILED);
+            transactionRepository.create(transaction);
+            return transaction;
+        }
+
+
+        sourceCard.setBalance(sourceCard.getBalance() - (amount + fee));
+        destinationCard.setBalance(destinationCard.getBalance() + amount);
+
+        cardRepository.update(sourceCard);
+        cardRepository.update(destinationCard);
+
+        transaction.setTransactionStatus(TransactionStatus.SUCCESSFUL);
+
+        transactionRepository.create(transaction);
+
+        return transaction;
+    }
+
+
 }
