@@ -20,7 +20,7 @@ public class CardRepositoryImp implements CardRepository {
     public Card create(Card card) {
         String query = "insert into cards (card_number, bank_name, " +
                 "balance, expired_date, user_id) values (?, ?, ?, ?, ?)";
-        try (PreparedStatement preparedStatement = connection.prepareStatement(query)){
+        try (PreparedStatement preparedStatement = connection.prepareStatement(query, Statement.RETURN_GENERATED_KEYS)){
             preparedStatement.setString(1, card.getCardNumber());
             preparedStatement.setString(2, card.getBankName().name());
             preparedStatement.setDouble(3, card.getBalance());

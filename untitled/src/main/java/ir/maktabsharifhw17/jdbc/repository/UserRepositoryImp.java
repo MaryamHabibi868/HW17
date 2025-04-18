@@ -2,10 +2,7 @@ package ir.maktabsharifhw17.jdbc.repository;
 
 import ir.maktabsharifhw17.jdbc.domains.User;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
+import java.sql.*;
 import java.util.List;
 import java.util.Optional;
 
@@ -21,7 +18,7 @@ public class UserRepositoryImp implements UserRepository {
     public User create(User user) {
         String query = "INSERT INTO users (first_name, " +
                 "last_name, user_name, password) VALUES (?, ?, ?, ?)";
-        try (PreparedStatement preparedStatement = connection.prepareStatement(query)){
+        try (PreparedStatement preparedStatement = connection.prepareStatement(query, Statement.RETURN_GENERATED_KEYS)){
             preparedStatement.setString(1, user.getFirstName());
             preparedStatement.setString(2, user.getLastName());
             preparedStatement.setString(3, user.getUserName());
@@ -40,6 +37,7 @@ public class UserRepositoryImp implements UserRepository {
             }
         }
         catch (SQLException e) {
+            e.printStackTrace();
             throw new RuntimeException("Error creating user");
         }
     }

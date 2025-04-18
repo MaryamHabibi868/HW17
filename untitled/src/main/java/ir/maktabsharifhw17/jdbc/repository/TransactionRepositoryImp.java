@@ -29,7 +29,7 @@ public class TransactionRepositoryImp implements
                 " amount , transaction_type , transaction_status , transaction_date)" +
                 " values ( ? , ? , ? , ? , ? , ?)";
 
-        try (PreparedStatement preparedStatement = connection.prepareStatement(query)){
+        try (PreparedStatement preparedStatement = connection.prepareStatement(query, Statement.RETURN_GENERATED_KEYS)){
             preparedStatement.setString(1 , transaction.getSourceCard().getCardNumber());
             preparedStatement.setString(2 , transaction.getDestinationCard().getCardNumber());
             preparedStatement.setDouble(3 , transaction.getAmount());
