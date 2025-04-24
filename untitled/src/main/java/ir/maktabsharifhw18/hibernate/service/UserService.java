@@ -1,3 +1,4 @@
+/*
 package ir.maktabsharifhw18.hibernate.service;
 
 import ir.maktabsharifhw18.hibernate.config.ApplicationContext;
@@ -41,3 +42,4 @@ public class UserService {
     }
 }
 
+*/

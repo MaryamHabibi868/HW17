@@ -1,11 +1,13 @@
 package ir.maktabsharifhw18.hibernate.repository;
 
 import ir.maktabsharifhw18.hibernate.entity.User;
+import lombok.NoArgsConstructor;
 
 import java.sql.*;
 import java.util.List;
 import java.util.Optional;
 
+@NoArgsConstructor
 public class UserRepositoryImp implements UserRepository {
 
     private final Connection connection;

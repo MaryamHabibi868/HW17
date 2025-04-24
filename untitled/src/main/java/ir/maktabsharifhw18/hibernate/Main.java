@@ -1,3 +1,4 @@
+/*
 package ir.maktabsharifhw18.hibernate;
 
 
@@ -152,3 +153,4 @@ public class Main {
         }
     }
 }
+*/
