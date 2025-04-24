@@ -6,12 +6,13 @@ public interface TransactionRepository {
     void save(Transaction transaction);
 
      Transaction perfomCardToCard
-            (String sourceCard, String destinationCardNumber,
+            (String sourceCard, String destinationCard,
              double amount);
 
-     Transaction performPaya(String sourceCardNumber, String destinationCardNumber,
+     Transaction performPaya(String sourceCard, String destinationCard,
                                    double amount);
 
-    public Transaction performSatna(String sourceCardNumber, String destinationCardNumber,
+    public Transaction performSatna(String sourceCard,
+                                    String destinationCard,
                                     double amount);
 }
